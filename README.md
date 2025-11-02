@@ -15,4 +15,4 @@ A fun interactive web game where you try to guess the secret number between 1 an
 - Vanilla JavaScript
 
 ## 🌐 Live Demo
-[Click here to play]
+[Click here to play]https://shruti8122.github.io/guess-the-number-game/
