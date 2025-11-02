@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guess The Number</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ---------- RESET ---------- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #74ABE2, #5563DE, #9b59b6, #e056fd);
+      background-size: 400% 400%;
+      animation: gradientShift 10s ease infinite;
+      overflow: hidden;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ---------- CONTAINER ---------- */
+    .container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(18px);
+      border-radius: 25px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+      padding: 45px 35px;
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+      color: #fff;
+      transition: transform 0.5s ease, box-shadow 0.5s ease;
+      animation: fadeIn 1.3s ease;
+    }
+
+    .container:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 30px rgba(255,255,255,0.25);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(25px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2.4rem;
+      margin-bottom: 12px;
+      color: #fff;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(255,255,255,0.3);
+    }
+
+    h2 {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #f0e6ff;
+      margin-bottom: 30px;
+    }
+
+    /* ---------- SECRET NUMBER ---------- */
+    #secret-number {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 4rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.75);
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+      margin: 15px 0 30px;
+      transition: color 0.8s ease, text-shadow 0.8s ease, transform 0.6s ease;
+    }
+
+    #secret-number.reveal {
+      color: #00ffae;
+      text-shadow: 0 0 25px #00ffae, 0 0 50px #00ffae;
+      transform: scale(1.2);
+      animation: pulseGlow 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { text-shadow: 0 0 25px #00ffae, 0 0 50px #00ffae; }
+      100% { text-shadow: 0 0 15px #00ffae, 0 0 30px #00ffae; }
+    }
+
+    /* ---------- INPUT ---------- */
+    .input-container {
+      width: 80%;
+      max-width: 260px;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .guess-label {
+      position: absolute;
+      top: -24px;
+      left: 0;
+      font-size: 0.95rem;
+      color: #fff;
+      opacity: 0.8;
+    }
+
+    #Guess {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.1rem;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      outline: none;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.85);
+      color: #333;
+      transition: box-shadow 0.3s, transform 0.3s, border 0.3s;
+    }
+
+    #Guess:focus {
+      border: 2px solid #a260f6;
+      box-shadow: 0 0 10px rgba(162, 96, 246, 0.6);
+      transform: scale(1.04);
+    }
+
+    /* ---------- BUTTON ---------- */
+    #Submit {
+      margin-top: 20px;
+      background: linear-gradient(135deg, #8E44AD, #9B59B6);
+      border: none;
+      color: white;
+      padding: 14px 40px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.4s ease;
+    }
+
+    #Submit:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(255,255,255,0.3);
+      background: linear-gradient(135deg, #a95be9, #bb70f5);
+    }
+
+    #Submit:active {
+      transform: scale(0.97);
+    }
+
+    /* ---------- RESULT ---------- */
+    #result {
+      font-size: 1.4rem;
+      margin-top: 25px;
+      min-height: 40px;
+      color: #fff;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    #result.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ---------- MODAL ---------- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.5s ease;
+      z-index: 10;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 30px 40px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 0 25px rgba(255,255,255,0.3);
+      animation: popIn 0.6s ease;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .play-again-btn {
+      background: linear-gradient(135deg, #16a085, #1abc9c);
+      color: #fff;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .play-again-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(26, 188, 156, 0.5);
+    }
+
+    footer {
+      margin-top: 35px;
+      color: #eee;
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 480px) {
+      h1 { font-size: 1.9rem; }
+      #secret-number { font-size: 3rem; }
+      #Submit { font-size: 1rem; padding: 12px 30px; }
+      .modal-content { width: 85%; padding: 25px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Guess The Number</h1>
+    <h2>I'm thinking of a number between 1 and 20. Can you guess it?</h2>
+    <span id="secret-number">?</span>
+    <br><br>
+    <form class="guess-form">
+      <div class="input-container">
+        <label for="Guess" class="guess-label">Enter Your Guess:</label>
+        <input type="number" id="Guess" placeholder="Guess..." min="1" max="100">
+      </div>
+      <button type="submit" id="Submit">Submit</button>
+    </form>
+
+    <p id="result"></p>
+
+    <footer>Made with by Shruti</footer>
+  </div>
+
+  <div id="win-modal" class="modal-overlay">
+    <div class="modal-content">
+      <p id="modal-message" style="font-size:1.5rem; font-weight:600;">🎉 Congratulations!</p>
+      <p id="modal-sub-message"></p>
+      <p id="final-score" style="margin-top:10px; font-size:1.1rem;"></p>
+      <button id="play-again" class="play-again-btn">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    let secretNumber;
+    let attempts = 0;
+    const numberDisplay = document.getElementById("secret-number");
+    const guessInput = document.getElementById("Guess");
+    const submitButton = document.getElementById("Submit");
+    const resultDisplay = document.getElementById("result");
+
+    const winModal = document.getElementById("win-modal");
+    const modalSubMessage = document.getElementById("modal-sub-message");
+    const finalScore = document.getElementById("final-score");
+    const playAgainButton = document.getElementById("play-again");
+
+    function initializeGame() {
+      secretNumber = Math.floor(Math.random() * 20) + 1;
+      attempts = 0;
+      numberDisplay.textContent = "?";
+      numberDisplay.classList.remove("reveal");
+      resultDisplay.textContent = "";
+      guessInput.value = "";
+      submitButton.disabled = false;
+      winModal.classList.remove("active");
+    }
+
+    function showWinModal() {
+      modalSubMessage.textContent = `The secret number was ${secretNumber}!`;
+      finalScore.textContent = `You guessed it in ${attempts} attempt${attempts !== 1 ? 's' : ''}!`;
+      winModal.classList.add("active");
+    }
+
+    function checkGuess(event) {
+      event.preventDefault();
+      const userGuess = parseInt(guessInput.value);
+
+      if (isNaN(userGuess) || userGuess < 1 || userGuess > 20) {
+        resultDisplay.textContent = "⚠️ Enter a valid number (1-20)";
+        resultDisplay.style.color = "#ffcd57";
+        return;
+      }
+
+      attempts++;
+      resultDisplay.style.color = "#fff";
+
+      if (userGuess === secretNumber) {
+        resultDisplay.textContent = "";
+        numberDisplay.textContent = secretNumber;
+        numberDisplay.classList.add("reveal");
+        submitButton.disabled = true;
+        setTimeout(showWinModal, 1500);
+      } else if (userGuess < secretNumber) {
+        resultDisplay.textContent = "⬇️ Too low! Try again.";
+      } else {
+        resultDisplay.textContent = "⬆️ Too high! Try again.";
+      }
+
+      guessInput.value = "";
+      guessInput.focus();
+    }
+
+    document.querySelector(".guess-form").addEventListener("submit", checkGuess);
+    playAgainButton.addEventListener("click", initializeGame);
+
+    initializeGame();
+  </script>
+</body>
+</html>
